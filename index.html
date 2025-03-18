@@ -173,7 +173,7 @@
 <body>
 
     <div class="top-bar">
-        <input id="urlInput" placeholder="Enter a URL" aria-label="URL Input" value="">
+        <input id="urlInput" placeholder="Enter a URL or search term" aria-label="URL Input" value="">
         <button onclick="loadURL()">Load</button>
         <button onclick="reloadTab()">🔄 Reload</button>
         <button onclick="newTab()">➕ New Tab</button>
@@ -203,67 +203,82 @@
         let tabs = [];
         let activeTab = null;
 
-        function loadURL() {
-            let urlInput = document.getElementById("urlInput");
-            let url = urlInput.value.trim();
-            if (!url) return alert("Please enter a valid URL.");
-            if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+        function isValidURL(string) {
+            let url;
+            try {
+                url = new URL(string);
+            } catch (_) {
+                return false;  
+            }
+            return url.protocol === "http:" || url.protocol === "https:";
+        }
 
-            let isBlocked = blockedSites.some(site => url.includes(site));
+        function loadURL() {
+            const urlInput = document.getElementById("urlInput");
+            let url = urlInput.value.trim();
+            if (!url) return alert("Please enter a valid URL or search term.");
+
+            // If it's a valid URL, use it directly
+            if (isValidURL(url)) {
+                // No need to prepend anything, just use it as is.
+            } else {
+                // If it seems like a search term, use Bing for searching
+                url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
+            }
+
+            const isBlocked = blockedSites.some(site => url.includes(site));
 
             if (isBlocked) {
-                let useProxy = confirm("This site is blocked from embedding. Do you want to use a proxy?");
+                const useProxy = confirm("This site is blocked from embedding. Do you want to use a proxy?");
                 if (useProxy) url = proxyUrl + encodeURIComponent(url);
             }
 
             if (activeTab) {
-                activeTab.iframe.src = url;
                 activeTab.url = url;
-                urlInput.value = activeTab.url;
-
-                // Update the tab content after loading the URL
-                updateTabTitleAndFavicon(activeTab, url);
+                activeTab.iframe.src = url;
+                urlInput.value = url;
+                updateTabTitleAndFavicon(activeTab);
             }
         }
 
         function reloadTab() {
             if (activeTab) {
-                try {
-                    activeTab.iframe.contentWindow.location.reload();
-                } catch (e) {
-                    activeTab.iframe.src = activeTab.iframe.src;
-                }
+                activeTab.iframe.src = activeTab.iframe.src; // Reload the current URL
             }
         }
 
         function newTab() {
-            let tabId = "tab" + Date.now();
-            let tab = { id: tabId, url: "", iframe: null, title: "", favicon: "" };
+            const tabId = "tab" + Date.now();
+            const tab = { id: tabId, url: "", iframe: null, title: "", favicon: "" };
 
-            let tabElement = document.createElement("div");
-            tabElement.className = "tab";
-            tabElement.dataset.id = tabId;
-            tabElement.onclick = () => switchTab(tabId);
-
-            // Create and append close button
-            const closeBtn = document.createElement('span');
-            closeBtn.className = 'close-tab';
-            closeBtn.innerHTML = '❌';
-            closeBtn.onclick = (e) => {
-                e.stopPropagation();
-                closeTab(tabId);
-            };
-
-            tabElement.appendChild(closeBtn);
+            const tabElement = createTabElement(tab);
             document.getElementById("tabsContainer").appendChild(tabElement);
 
-            let iframe = document.createElement("iframe");
+            const iframe = document.createElement("iframe");
             iframe.src = "about:blank"; 
             document.getElementById("iframeContainer").appendChild(iframe);
 
             tab.iframe = iframe;
             tabs.push(tab);
             switchTab(tabId);
+        }
+
+        function createTabElement(tab) {
+            const tabElement = document.createElement("div");
+            tabElement.className = "tab";
+            tabElement.dataset.id = tab.id;
+            tabElement.onclick = () => switchTab(tab.id);
+
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'close-tab';
+            closeBtn.innerHTML = '❌';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                closeTab(tab.id);
+            };
+
+            tabElement.appendChild(closeBtn);
+            return tabElement;
         }
 
         function switchTab(tabId) {
@@ -275,33 +290,29 @@
             activeTab = tabs.find(tab => tab.id === tabId);
             if (activeTab) {
                 activeTab.iframe.style.display = "block";
-                activeTab.iframe.style.height = "calc(100vh - 60px)"; // Adjust for top bar and possible tabs height
+                activeTab.iframe.style.height = "calc(100vh - 60px)"; 
                 document.querySelector(`.tab[data-id="${activeTab.id}"]`).classList.add("active");
                 document.getElementById("urlInput").value = activeTab.url;
 
-                // Set the iframe url and fetch the title and favicon after it loads
                 activeTab.iframe.onload = () => {
-                    updateTabTitleAndFavicon(activeTab, activeTab.iframe.src);
+                    updateTabTitleAndFavicon(activeTab);
                 };
             }
         }
 
-        function updateTabTitleAndFavicon(tab, url) {
-            const faviconUrl = new URL(url).origin + "/favicon.ico"; // Simple way to derive favicon URL
-
-            // Fetching the title and favicon
-            tab.iframe.contentWindow.document.title = tab.iframe.contentWindow.document.title || "Untitled";
-            tab.title = tab.iframe.contentWindow.document.title;
+        function updateTabTitleAndFavicon(tab) {
+            const iframeDoc = tab.iframe.contentDocument || tab.iframe.contentWindow.document;
+            tab.title = iframeDoc.title || "Untitled";
+            const faviconUrl = new URL(tab.iframe.src).origin + "/favicon.ico"; 
             tab.favicon = faviconUrl;
 
-            // Update the tab display
             const tabElement = document.querySelector(`.tab[data-id="${tab.id}"]`);
             tabElement.innerHTML = `<img src="${tab.favicon}" alt="favicon" style="width:16px; height:16px; margin-right:4px;"/> ${tab.title}`;
-            tabElement.appendChild(tabElement.querySelector('.close-tab')); // Append close button back
+            tabElement.appendChild(tabElement.querySelector('.close-tab'));
         }
 
         function closeTab(tabId) {
-            let tabIndex = tabs.findIndex(tab => tab.id === tabId);
+            const tabIndex = tabs.findIndex(tab => tab.id === tabId);
             if (tabIndex !== -1) {
                 document.getElementById("iframeContainer").removeChild(tabs[tabIndex].iframe);
                 document.getElementById("tabsContainer").removeChild(document.querySelector(`.tab[data-id="${tabId}"]`));
@@ -317,26 +328,28 @@
 
         function openDevTools() {
             if (!window.eruda) {
-                let script = document.createElement('script');
+                const script = document.createElement('script');
                 script.src = "https://cdn.jsdelivr.net/npm/eruda";
                 script.onload = () => eruda.init();
                 document.body.appendChild(script);
-            } else eruda.show();
+            } else {
+                eruda.show();
+            }
         }
 
         function enableAdBlock() {
-            let css = `
+            const css = `
                 iframe[src*="ads"], [id*="ads"], [class*="ads"], [class*="sponsored"],
                 [src*="doubleclick.net"], [src*="googlesyndication.com"], [src*="taboola.com"],
                 [src*="outbrain.com"], [href*="ads"], [aria-label*="ads"], [role="banner"],
                 [class*="advert"], [id*="advert"], [id*="ad-container"] { display: none !important; }
             `;
 
-            let style = document.createElement('style');
+            const style = document.createElement('style');
             style.innerHTML = css;
             document.head.appendChild(style);
 
-            let adBlockBtn = document.getElementById("adBlockBtn");
+            const adBlockBtn = document.getElementById("adBlockBtn");
             adBlockBtn.textContent = "Ads Blocked ✅";
             adBlockBtn.style.background = "#4CAF50";
             adBlockBtn.disabled = true;
