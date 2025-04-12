@@ -1,393 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Custom Site Launcher</title>
+  <style>
+    /* Base styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #1c1c1c;
-            color: #e0e0e0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    body, html {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
 
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            width: 100%;
-            background: #282828;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+    .container {
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
 
-        input {
-            flex: 1;
-            max-width: 400px;
-            padding: 8px;
-            font-size: 14px;
-            border: 2px solid #ff1b6b;
-            border-radius: 8px;
-            background: #333;
-            color: #e0e0e0;
-            outline: none;
-        }
+    /* Dark & light mode styles */
+    body.dark-mode {
+      background: #121212;
+      color: #f0f0f0;
+    }
 
-        button {
-            background: #ff1b6b;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
+    .container.dark-mode {
+      background-color: #1f1f2e;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+    }
 
-        button:hover {
-            background: #ff004c;
-            transform: scale(1.05);
-        }
+    body.light-mode {
+      background: #f7f7f7;
+      color: #333;
+    }
 
-        .tabs {
-            display: flex;
-            width: 100%;
-            overflow-x: auto;
-            background: #282828;
-            padding: 5px;
-            gap: 5px;
-            white-space: nowrap;
-        }
+    .container.light-mode {
+      background-color: #ffffff;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
 
-        .tab {
-            padding: 8px 12px;
-            background: #444;
-            border-radius: 6px;
-            color: #e0e0e0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
+    /* Heading */
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
 
-        .tab.active {
-            background: #ff1b6b;
-            color: white;
-        }
+    /* Inputs and selects */
+    select, input[type="text"] {
+      padding: 12px 16px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 1em;
+      outline: none;
+      background: #3a3a54;
+      color: #f0f0f0;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+      transition: background 0.3s ease;
+    }
 
-        .tab:hover {
-            background: #555;
-        }
+    input[type="text"]:focus, select:focus {
+      background: #5f5f80;
+    }
 
-        .close-tab {
-            margin-left: 8px;
-            cursor: pointer;
-            color: #ff1b6b;
-            background: #555;
-            border-radius: 50%;
-            padding: 4px 6px;
-            height: 24px;
-            width: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.3s;
-        }
+    input::placeholder {
+      color: #aaa;
+    }
 
-        .close-tab:hover {
-            background: #ff4c4c;
-            color: white;
-        }
+    /* Buttons */
+    .go-btn,
+    .theme-toggle-btn,
+    .add-site-btn,
+    .remove-site-btn {
+      padding: 14px 35px;
+      font-size: 1.05em;
+      color: #fff;
+      background: linear-gradient(145deg, #4a00e0, #8e2de2);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 10px;
+    }
 
-        #iframeContainer {
-            flex: 1;
-            width: 100%;
-            border-top: 2px solid #ff1b6b;
-            overflow: hidden;
-        }
+    /* Remove button specific styles */
+    .remove-site-btn {
+      background: linear-gradient(145deg, #e00000, #8e2d2d);
+    }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #222;
-        }
+    /* Button hover animation */
+    .go-btn::before,
+    .theme-toggle-btn::before,
+    .add-site-btn::before,
+    .remove-site-btn::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -75%;
+      width: 50%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: skewX(-20deg);
+      transition: 0.5s;
+    }
 
-        .settings {
-            margin: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            font-size: 14px;
-        }
+    .go-btn:hover::before,
+    .theme-toggle-btn:hover::before,
+    .add-site-btn:hover::before,
+    .remove-site-btn:hover::before {
+      left: 130%;
+    }
 
-        .settings label {
-            margin: 5px 0;
-        }
+    .go-btn:hover,
+    .theme-toggle-btn:hover,
+    .add-site-btn:hover,
+    .remove-site-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    }
 
-        .settings input[type="color"] {
-            width: 100px;
-            height: 30px;
-            border: none;
-            border-radius: 5px;
-        }
+    /* Error message */
+    .error {
+      margin-top: 10px;
+      color: #ff6b6b;
+      font-size: 0.9em;
+    }
 
-        .collapsible {
-            background-color: #333;
-            border: 1px solid #444;
-            border-radius: 6px;
-            margin-top: 10px;
-            padding: 10px;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            color: #e0e0e0;
-        }
+    /* Spinner */
+    .spinner {
+      display: none;
+      margin-top: 20px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
 
-        .content {
-            display: none;
-            flex-direction: column;
-            padding: 10px;
-            background-color: #444;
-            border-radius: 6px;
-            margin-top: 5px;
-        }
-    </style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Custom sites list */
+    .custom-sites {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .custom-site {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: #333;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .custom-site:hover {
+      background: #444;
+    }
+
+    .custom-site span {
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    .custom-site button {
+      background: #ff6b6b;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .custom-site button:hover {
+      background: #ff3c3c;
+    }
+
+  </style>
 </head>
+<body class="dark-mode">
+  <div class="container dark-mode">
+    <h1>Launch Your Favorite Site</h1>
 
-<body>
+    <!-- Dropdown for popular sites -->
+    <select id="siteDropdown" onchange="setFromDropdown()">
+      <option value="">Choose a popular site...</option>
+      <option value="https://www.google.com">Google</option>
+      <option value="https://www.youtube.com">YouTube</option>
+      <option value="https://www.reddit.com">Reddit</option>
+      <option value="https://www.github.com">GitHub</option>
+      <option value="https://www.netflix.com">Netflix</option>
+      <option value="https://www.wikipedia.org">Wikipedia</option>
+      <option value="https://www.twitter.com">Twitter (X)</option>
+    </select>
 
-    <div class="top-bar">
-        <input id="urlInput" placeholder="Enter a URL or search term" aria-label="URL Input" value="">
-        <button onclick="loadURL()">Load</button>
-        <button onclick="reloadTab()">🔄 Reload</button>
-        <button onclick="newTab()">➕ New Tab</button>
-        <button onclick="openDevTools()">Inspect 🔍</button>
-        <button onclick="enableAdBlock()" id="adBlockBtn">Block Ads 🚫</button>
-        <button onclick="toggleFullScreen()" id="fullscreenBtn">🗖 Fullscreen</button>
-    </div>
+    <!-- Text input for custom URLs -->
+    <input type="text" id="urlInput" placeholder="Or enter a full URL (e.g., https://example.com)" />
+    
+    <!-- Buttons -->
+    <button class="go-btn" onclick="goToSite()">Go</button>
+    <div class="spinner" id="spinner"></div>
+    <div id="errorMsg" class="error"></div>
 
-    <div class="tabs" id="tabsContainer"></div>
+    <!-- Theme toggle, add site, and clear cache buttons -->
+    <button class="theme-toggle-btn" onclick="toggleTheme()">Toggle Theme</button>
+    <button class="add-site-btn" onclick="addCustomSite()">Add Custom Site</button>
+    <button class="remove-site-btn" onclick="clearCache()">Clear Cache</button>
 
-    <div id="iframeContainer"></div>
+    <!-- Container for custom sites -->
+    <div class="custom-sites" id="customSitesContainer"></div>
+  </div>
 
-    <div class="settings">
-        <div class="collapsible" onclick="toggleSettings()">Customize Tabs</div>
-        <div class="content" id="settingsContent">
-            <label for="tabColor">Tab Color:</label>
-            <input type="color" id="tabColor" value="#444" onchange="updateTabColors(this.value)">
-            <label for="closeButtonColor">Close Button Color:</label>
-            <input type="color" id="closeButtonColor" value="#ff1b6b" onchange="updateCloseButtonColors(this.value)">
-        </div>
-    </div>
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const errorMsg = document.getElementById('errorMsg');
+    const spinner = document.getElementById('spinner');
+    const siteDropdown = document.getElementById('siteDropdown');
+    const customSitesContainer = document.getElementById('customSitesContainer');
 
-    <script>
-        let blockedSites = ["youtube.com", "github.com", "discord.com", "facebook.com", "twitter.com"];
-        let proxyUrl = "https://www.croxyproxy.com/?url=";
+    // Toggle between dark and light themes
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      document.body.classList.toggle('dark-mode');
+      document.querySelector('.container').classList.toggle('light-mode');
+      document.querySelector('.container').classList.toggle('dark-mode');
+    }
 
-        let tabs = [];
-        let activeTab = null;
+    // Set the URL input based on dropdown selection
+    function setFromDropdown() {
+      urlInput.value = siteDropdown.value;
+    }
 
-        function isValidURL(string) {
-            let url;
-            try {
-                url = new URL(string);
-            } catch (_) {
-                return false;  
-            }
-            return url.protocol === "http:" || url.protocol === "https:";
+    // Go to the website (either selected or typed in)
+    function goToSite(url = null) {
+      const inputUrl = url || urlInput.value.trim();
+      if (!inputUrl) {
+        errorMsg.textContent = "Please enter or select a URL.";
+        return;
+      }
+
+      const formattedUrl = /^https?:\/\//i.test(inputUrl) ? inputUrl : 'https://' + inputUrl;
+
+      try {
+        new URL(formattedUrl);
+        errorMsg.textContent = "";
+        spinner.style.display = "inline-block";
+        localStorage.setItem('lastUrl', formattedUrl);
+
+        setTimeout(() => {
+          window.open(formattedUrl, '_blank', 'width=800,height=600');
+          spinner.style.display = "none";
+        }, 1000);
+      } catch {
+        errorMsg.textContent = "Invalid URL. Try something like https://example.com";
+      }
+    }
+
+    // Add a custom site with a user-friendly input
+    function addCustomSite() {
+      const customSiteName = prompt("Enter a name for the site:");
+      if (!customSiteName) return; // Cancel was pressed
+
+      const customSiteUrl = prompt("Enter the full URL (e.g., https://example.com):");
+      if (!customSiteUrl) return; // Cancel was pressed
+
+      // Automatically add https:// if not present
+      let formattedUrl = customSiteUrl.trim();
+      if (!/^https?:\/\//i.test(formattedUrl)) {
+        formattedUrl = 'https://' + formattedUrl;
+      }
+
+      try {
+        new URL(formattedUrl);
+        const customSites = JSON.parse(localStorage.getItem('customSites')) || [];
+        customSites.push({ name: customSiteName, url: formattedUrl });
+        localStorage.setItem('customSites', JSON.stringify(customSites));
+        createCustomSiteElement(customSiteName, formattedUrl);
+        urlInput.value = formattedUrl;
+      } catch {
+        alert("Invalid URL. Please try again.");
+      }
+    }
+
+    // Create a custom site element in the DOM
+    function createCustomSiteElement(name, siteUrl) {
+      const siteDiv = document.createElement('div');
+      siteDiv.classList.add('custom-site');
+
+      siteDiv.innerHTML = `
+        <span>${name}</span>
+        <button class="remove-site-btn" onclick="removeCustomSite('${siteUrl.replace(/'/g, "\\'")}')">Remove</button>
+      `;
+
+      siteDiv.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+          goToSite(siteUrl);
         }
+      });
 
-        function loadURL() {
-            const urlInput = document.getElementById("urlInput");
-            let url = urlInput.value.trim();
-            if (!url) return alert("Please enter a valid URL or search term.");
+      customSitesContainer.appendChild(siteDiv);
+    }
 
-            // If it's a valid URL, use it directly
-            if (isValidURL(url)) {
-                // No need to prepend anything, just use it as is.
-            } else {
-                // If it seems like a search term, use Bing for searching
-                url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
-            }
+    // Remove a custom site
+    function removeCustomSite(siteUrl) {
+      let customSites = JSON.parse(localStorage.getItem('customSites')) || [];
+      customSites = customSites.filter(site => site.url !== siteUrl);
+      localStorage.setItem('customSites', JSON.stringify(customSites));
+      renderCustomSites();
+    }
 
-            const isBlocked = blockedSites.some(site => url.includes(site));
+    // Render all custom sites from storage
+    function renderCustomSites() {
+      customSitesContainer.innerHTML = '';
+      const customSites = JSON.parse(localStorage.getItem('customSites')) || [];
+      customSites.forEach(site => createCustomSiteElement(site.name, site.url));
+    }
 
-            if (isBlocked) {
-                const useProxy = confirm("This site is blocked from embedding. Do you want to use a proxy?");
-                if (useProxy) url = proxyUrl + encodeURIComponent(url);
-            }
+    // Clear cache (remove all custom sites)
+    function clearCache() {
+      if (confirm("Are you sure you want to clear all saved data?")) {
+        localStorage.clear();
+        urlInput.value = '';
+        renderCustomSites();
+        errorMsg.textContent = "Cache cleared successfully.";
+        setTimeout(() => {
+          errorMsg.textContent = "";
+        }, 3000);
+      }
+    }
 
-            if (activeTab) {
-                activeTab.url = url;
-                activeTab.iframe.src = url;
-                urlInput.value = url;
-                updateTabTitleAndFavicon(activeTab);
-            }
-        }
-
-        function reloadTab() {
-            if (activeTab) {
-                activeTab.iframe.src = activeTab.iframe.src; // Reload the current URL
-            }
-        }
-
-        function newTab() {
-            const tabId = "tab" + Date.now();
-            const tab = { id: tabId, url: "", iframe: null, title: "", favicon: "" };
-
-            const tabElement = createTabElement(tab);
-            document.getElementById("tabsContainer").appendChild(tabElement);
-
-            const iframe = document.createElement("iframe");
-            iframe.src = "about:blank"; 
-            document.getElementById("iframeContainer").appendChild(iframe);
-
-            tab.iframe = iframe;
-            tabs.push(tab);
-            switchTab(tabId);
-        }
-
-        function createTabElement(tab) {
-            const tabElement = document.createElement("div");
-            tabElement.className = "tab";
-            tabElement.dataset.id = tab.id;
-            tabElement.onclick = () => switchTab(tab.id);
-
-            const closeBtn = document.createElement('span');
-            closeBtn.className = 'close-tab';
-            closeBtn.innerHTML = '❌';
-            closeBtn.onclick = (e) => {
-                e.stopPropagation();
-                closeTab(tab.id);
-            };
-
-            tabElement.appendChild(closeBtn);
-            return tabElement;
-        }
-
-        function switchTab(tabId) {
-            tabs.forEach(tab => {
-                tab.iframe.style.display = "none";
-                document.querySelector(`.tab[data-id="${tab.id}"]`).classList.remove("active");
-            });
-
-            activeTab = tabs.find(tab => tab.id === tabId);
-            if (activeTab) {
-                activeTab.iframe.style.display = "block";
-                activeTab.iframe.style.height = "calc(100vh - 60px)"; 
-                document.querySelector(`.tab[data-id="${activeTab.id}"]`).classList.add("active");
-                document.getElementById("urlInput").value = activeTab.url;
-
-                activeTab.iframe.onload = () => {
-                    updateTabTitleAndFavicon(activeTab);
-                };
-            }
-        }
-
-        function updateTabTitleAndFavicon(tab) {
-            const iframeDoc = tab.iframe.contentDocument || tab.iframe.contentWindow.document;
-            tab.title = iframeDoc.title || "Untitled";
-            const faviconUrl = new URL(tab.iframe.src).origin + "/favicon.ico"; 
-            tab.favicon = faviconUrl;
-
-            const tabElement = document.querySelector(`.tab[data-id="${tab.id}"]`);
-            tabElement.innerHTML = `<img src="${tab.favicon}" alt="favicon" style="width:16px; height:16px; margin-right:4px;"/> ${tab.title}`;
-            tabElement.appendChild(tabElement.querySelector('.close-tab'));
-        }
-
-        function closeTab(tabId) {
-            const tabIndex = tabs.findIndex(tab => tab.id === tabId);
-            if (tabIndex !== -1) {
-                document.getElementById("iframeContainer").removeChild(tabs[tabIndex].iframe);
-                document.getElementById("tabsContainer").removeChild(document.querySelector(`.tab[data-id="${tabId}"]`));
-                tabs.splice(tabIndex, 1);
-            }
-            if (tabs.length > 0) {
-                switchTab(tabs[0].id);
-            } else {
-                activeTab = null;
-                document.getElementById("urlInput").value = "";
-            }
-        }
-
-        function openDevTools() {
-            if (!window.eruda) {
-                const script = document.createElement('script');
-                script.src = "https://cdn.jsdelivr.net/npm/eruda";
-                script.onload = () => eruda.init();
-                document.body.appendChild(script);
-            } else {
-                eruda.show();
-            }
-        }
-
-        function enableAdBlock() {
-            const css = `
-                iframe[src*="ads"], [id*="ads"], [class*="ads"], [class*="sponsored"],
-                [src*="doubleclick.net"], [src*="googlesyndication.com"], [src*="taboola.com"],
-                [src*="outbrain.com"], [href*="ads"], [aria-label*="ads"], [role="banner"],
-                [class*="advert"], [id*="advert"], [id*="ad-container"] { display: none !important; }
-            `;
-
-            const style = document.createElement('style');
-            style.innerHTML = css;
-            document.head.appendChild(style);
-
-            const adBlockBtn = document.getElementById("adBlockBtn");
-            adBlockBtn.textContent = "Ads Blocked ✅";
-            adBlockBtn.style.background = "#4CAF50";
-            adBlockBtn.disabled = true;
-        }
-
-        function updateTabColors(color) {
-            const tabElements = document.querySelectorAll('.tab');
-            tabElements.forEach(tab => {
-                tab.style.background = color;
-            });
-        }
-
-        function updateCloseButtonColors(color) {
-            const closeButtons = document.querySelectorAll('.close-tab');
-            closeButtons.forEach(btn => {
-                btn.style.color = color;
-            });
-        }
-
-        function toggleSettings() {
-            const settingsContent = document.getElementById("settingsContent");
-            settingsContent.style.display = settingsContent.style.display === "flex" ? "none" : "flex";
-        }
-
-        // Fullscreen functionality
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        newTab(); // Initialize the first tab
-    </script>
-
+    // Initialize the page with the last visited URL and custom sites
+    window.onload = () => {
+      const lastUrl = localStorage.getItem('lastUrl');
+      if (lastUrl) urlInput.value = lastUrl;
+      renderCustomSites();
+    };
+  </script>
 </body>
-
 </html>
