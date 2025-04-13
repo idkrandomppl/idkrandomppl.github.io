@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Custom Site Launcher</title>
+  <title>Site Launcher</title>
   <style>
-    /* Base styling */
+    /* Reset and Base */
     * {
       margin: 0;
       padding: 0;
@@ -13,154 +13,133 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    body, html {
+    html, body {
       height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-
-    .container {
-      padding: 30px;
-      border-radius: 15px;
-      max-width: 500px;
-      width: 100%;
-      text-align: center;
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Dark & light mode styles */
-    body.dark-mode {
-      background: #121212;
+      background-color: #121212;
       color: #f0f0f0;
-    }
-
-    .container.dark-mode {
-      background-color: #1f1f2e;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+      transition: background 0.3s, color 0.3s;
     }
 
     body.light-mode {
-      background: #f7f7f7;
+      background-color: #f7f7f7;
       color: #333;
     }
 
-    .container.light-mode {
-      background-color: #ffffff;
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .card {
+      background-color: #1f1f2e;
+      border-radius: 16px;
+      padding: 30px;
+      width: 100%;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .light-mode .card {
+      background-color: #fff;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
 
-    /* Heading */
     h1 {
-      font-size: 2.2em;
-      margin-bottom: 20px;
+      font-size: 2.2rem;
       font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
     }
 
-    /* Inputs and selects */
     select, input[type="text"] {
-      padding: 12px 16px;
       width: 100%;
-      border: none;
+      padding: 12px 16px;
       border-radius: 8px;
+      border: none;
       margin-bottom: 15px;
-      font-size: 1em;
-      outline: none;
+      font-size: 1rem;
       background: #3a3a54;
-      color: #f0f0f0;
-      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
-      transition: background 0.3s ease;
-    }
-
-    input[type="text"]:focus, select:focus {
-      background: #5f5f80;
+      color: #fff;
+      transition: background 0.3s;
     }
 
     input::placeholder {
       color: #aaa;
     }
 
-    /* Buttons */
-    .go-btn,
-    .theme-toggle-btn,
-    .add-site-btn,
-    .remove-site-btn {
-      padding: 14px 35px;
-      font-size: 1.05em;
+    input:focus, select:focus {
+      background: #5f5f80;
+      outline: none;
+    }
+
+    button {
+      display: inline-block;
+      padding: 14px 30px;
+      margin: 10px 5px 0;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
       color: #fff;
       background: linear-gradient(145deg, #4a00e0, #8e2de2);
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
       position: relative;
       overflow: hidden;
-      margin-top: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    /* Remove button specific styles */
-    .remove-site-btn {
-      background: linear-gradient(145deg, #e00000, #8e2d2d);
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
     }
 
-    /* Button hover animation */
-    .go-btn::before,
-    .theme-toggle-btn::before,
-    .add-site-btn::before,
-    .remove-site-btn::before {
+    button::before {
       content: "";
       position: absolute;
-      top: 0; left: -75%;
+      top: 0;
+      left: -75%;
       width: 50%;
       height: 100%;
       background: rgba(255, 255, 255, 0.2);
       transform: skewX(-20deg);
-      transition: 0.5s;
+      transition: left 0.5s;
     }
 
-    .go-btn:hover::before,
-    .theme-toggle-btn:hover::before,
-    .add-site-btn:hover::before,
-    .remove-site-btn:hover::before {
+    button:hover::before {
       left: 130%;
     }
 
-    .go-btn:hover,
-    .theme-toggle-btn:hover,
-    .add-site-btn:hover,
-    .remove-site-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    .remove-site-btn {
+      background: linear-gradient(145deg, #e00000, #8e2d2d);
     }
 
-    /* Error message */
-    .error {
-      margin-top: 10px;
-      color: #ff6b6b;
-      font-size: 0.9em;
-    }
-
-    /* Spinner */
     .spinner {
       display: none;
-      margin-top: 20px;
+      width: 30px;
+      height: 30px;
       border: 4px solid rgba(255, 255, 255, 0.3);
       border-top: 4px solid #fff;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      margin: 15px auto;
       animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      to { transform: rotate(360deg); }
     }
 
-    /* Custom sites list */
+    .error {
+      color: #ff6b6b;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
     .custom-sites {
       margin-top: 25px;
       display: flex;
@@ -172,21 +151,16 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 15px;
       background: #333;
+      padding: 10px 15px;
       border-radius: 8px;
-      color: #fff;
       cursor: pointer;
-      transition: background 0.3s ease;
+      color: #fff;
+      transition: background 0.3s;
     }
 
     .custom-site:hover {
       background: #444;
-    }
-
-    .custom-site span {
-      flex-grow: 1;
-      text-align: left;
     }
 
     .custom-site button {
@@ -202,165 +176,91 @@
       background: #ff3c3c;
     }
 
+    /* FAQ Section */
+    footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .faq {
+      margin-top: 20px;
+    }
+
+    .faq h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .faq-item {
+      margin-bottom: 10px;
+    }
+
+    .faq-item strong {
+      display: block;
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body class="dark-mode">
-  <div class="container dark-mode">
-    <h1>Launch Your Favorite Site</h1>
+  <main>
+    <div class="card">
+      <h1>Launch Your Favorite Site</h1>
+      <select id="siteDropdown" onchange="setFromDropdown()">
+        <option value="">Choose a popular site...</option>
+        <option value="https://www.google.com">Google</option>
+        <option value="https://www.youtube.com">YouTube</option>
+        <option value="https://www.reddit.com">Reddit</option>
+        <option value="https://www.github.com">GitHub</option>
+        <option value="https://www.netflix.com">Netflix</option>
+        <option value="https://www.wikipedia.org">Wikipedia</option>
+        <option value="https://www.twitter.com">Twitter (X)</option>
+      </select>
 
-    <!-- Dropdown for popular sites -->
-    <select id="siteDropdown" onchange="setFromDropdown()">
-      <option value="">Choose a popular site...</option>
-      <option value="https://www.google.com">Google</option>
-      <option value="https://www.youtube.com">YouTube</option>
-      <option value="https://www.reddit.com">Reddit</option>
-      <option value="https://www.github.com">GitHub</option>
-      <option value="https://www.netflix.com">Netflix</option>
-      <option value="https://www.wikipedia.org">Wikipedia</option>
-      <option value="https://www.twitter.com">Twitter (X)</option>
-    </select>
+      <input type="text" id="urlInput" placeholder="Or enter a full URL (e.g., https://example.com)" />
+      
+      <button onclick="goToSite()">Go</button>
+      <div class="spinner" id="spinner"></div>
+      <div id="errorMsg" class="error"></div>
 
-    <!-- Text input for custom URLs -->
-    <input type="text" id="urlInput" placeholder="Or enter a full URL (e.g., https://example.com)" />
-    
-    <!-- Buttons -->
-    <button class="go-btn" onclick="goToSite()">Go</button>
-    <div class="spinner" id="spinner"></div>
-    <div id="errorMsg" class="error"></div>
+      <button onclick="toggleTheme()">Toggle Theme</button>
+      <button onclick="addCustomSite()">Add Custom Site</button>
+      <button class="remove-site-btn" onclick="clearCache()">Clear Cache</button>
 
-    <!-- Theme toggle, add site, and clear cache buttons -->
-    <button class="theme-toggle-btn" onclick="toggleTheme()">Toggle Theme</button>
-    <button class="add-site-btn" onclick="addCustomSite()">Add Custom Site</button>
-    <button class="remove-site-btn" onclick="clearCache()">Clear Cache</button>
+      <div class="custom-sites" id="customSitesContainer"></div>
+    </div>
 
-    <!-- Container for custom sites -->
-    <div class="custom-sites" id="customSitesContainer"></div>
-  </div>
+    <!-- FAQ Section -->
+    <footer>
+      <div class="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+          <strong>How do I add a custom site?</strong>
+          <span>Click the "Add Custom Site" button, enter a name and full URL when prompted.</span>
+        </div>
+        <div class="faq-item">
+          <strong>What happens when I click "Go"?</strong>
+          <span>Your selected or entered URL opens in a new tab/window.</span>
+        </div>
+        <div class="faq-item">
+          <strong>How do I switch between light and dark mode?</strong>
+          <span>Use the "Toggle Theme" button to switch themes instantly.</span>
+        </div>
+        <div class="faq-item">
+          <strong>How can I delete saved sites?</strong>
+          <span>Click the "Remove" button next to any custom site.</span>
+        </div>
+        <div class="faq-item">
+          <strong>What does "Clear Cache" do?</strong>
+          <span>It removes all saved custom sites and the last visited URL from your browser’s local storage.</span>
+        </div>
+      </div>
+    </footer>
+  </main>
 
   <script>
     const urlInput = document.getElementById('urlInput');
     const errorMsg = document.getElementById('errorMsg');
     const spinner = document.getElementById('spinner');
     const siteDropdown = document.getElementById('siteDropdown');
-    const customSitesContainer = document.getElementById('customSitesContainer');
-
-    // Toggle between dark and light themes
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
-      document.body.classList.toggle('dark-mode');
-      document.querySelector('.container').classList.toggle('light-mode');
-      document.querySelector('.container').classList.toggle('dark-mode');
-    }
-
-    // Set the URL input based on dropdown selection
-    function setFromDropdown() {
-      urlInput.value = siteDropdown.value;
-    }
-
-    // Go to the website (either selected or typed in)
-    function goToSite(url = null) {
-      const inputUrl = url || urlInput.value.trim();
-      if (!inputUrl) {
-        errorMsg.textContent = "Please enter or select a URL.";
-        return;
-      }
-
-      const formattedUrl = /^https?:\/\//i.test(inputUrl) ? inputUrl : 'https://' + inputUrl;
-
-      try {
-        new URL(formattedUrl);
-        errorMsg.textContent = "";
-        spinner.style.display = "inline-block";
-        localStorage.setItem('lastUrl', formattedUrl);
-
-        setTimeout(() => {
-          window.open(formattedUrl, '_blank', 'width=800,height=600');
-          spinner.style.display = "none";
-        }, 1000);
-      } catch {
-        errorMsg.textContent = "Invalid URL. Try something like https://example.com";
-      }
-    }
-
-    // Add a custom site with a user-friendly input
-    function addCustomSite() {
-      const customSiteName = prompt("Enter a name for the site:");
-      if (!customSiteName) return; // Cancel was pressed
-
-      const customSiteUrl = prompt("Enter the full URL (e.g., https://example.com):");
-      if (!customSiteUrl) return; // Cancel was pressed
-
-      // Automatically add https:// if not present
-      let formattedUrl = customSiteUrl.trim();
-      if (!/^https?:\/\//i.test(formattedUrl)) {
-        formattedUrl = 'https://' + formattedUrl;
-      }
-
-      try {
-        new URL(formattedUrl);
-        const customSites = JSON.parse(localStorage.getItem('customSites')) || [];
-        customSites.push({ name: customSiteName, url: formattedUrl });
-        localStorage.setItem('customSites', JSON.stringify(customSites));
-        createCustomSiteElement(customSiteName, formattedUrl);
-        urlInput.value = formattedUrl;
-      } catch {
-        alert("Invalid URL. Please try again.");
-      }
-    }
-
-    // Create a custom site element in the DOM
-    function createCustomSiteElement(name, siteUrl) {
-      const siteDiv = document.createElement('div');
-      siteDiv.classList.add('custom-site');
-
-      siteDiv.innerHTML = `
-        <span>${name}</span>
-        <button class="remove-site-btn" onclick="removeCustomSite('${siteUrl.replace(/'/g, "\\'")}')">Remove</button>
-      `;
-
-      siteDiv.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'BUTTON') {
-          goToSite(siteUrl);
-        }
-      });
-
-      customSitesContainer.appendChild(siteDiv);
-    }
-
-    // Remove a custom site
-    function removeCustomSite(siteUrl) {
-      let customSites = JSON.parse(localStorage.getItem('customSites')) || [];
-      customSites = customSites.filter(site => site.url !== siteUrl);
-      localStorage.setItem('customSites', JSON.stringify(customSites));
-      renderCustomSites();
-    }
-
-    // Render all custom sites from storage
-    function renderCustomSites() {
-      customSitesContainer.innerHTML = '';
-      const customSites = JSON.parse(localStorage.getItem('customSites')) || [];
-      customSites.forEach(site => createCustomSiteElement(site.name, site.url));
-    }
-
-    // Clear cache (remove all custom sites)
-    function clearCache() {
-      if (confirm("Are you sure you want to clear all saved data?")) {
-        localStorage.clear();
-        urlInput.value = '';
-        renderCustomSites();
-        errorMsg.textContent = "Cache cleared successfully.";
-        setTimeout(() => {
-          errorMsg.textContent = "";
-        }, 3000);
-      }
-    }
-
-    // Initialize the page with the last visited URL and custom sites
-    window.onload = () => {
-      const lastUrl = localStorage.getItem('lastUrl');
-      if (lastUrl) urlInput.value = lastUrl;
-      renderCustomSites();
-    };
-  </script>
-</body>
-</html>
+   
