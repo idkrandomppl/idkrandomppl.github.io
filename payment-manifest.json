@@ -1,2 +1,8 @@
-/*
-  Link: <payment-manifest.json>; rel="payment-method-manifest"
+{
+  "default_applications": [
+    "/pay/pay.json"
+  ],
+  "supported_origins": [
+    "https://*"
+  ]
+}
